@@ -9,6 +9,7 @@ A Node.js REST API that analyzes Azure DevOps backlog items against the Definiti
 - Generate structured feedback using Ollama LLM
 - Provide actionable recommendations for improvement
 - RESTful API endpoints for easy integration
+- Multi-language support (French and English)
 
 ## Definition of Ready
 
@@ -69,6 +70,9 @@ cp .env.example .env
 ```env
 PORT=3000
 
+# Language Configuration (fr for French, en for English)
+LANGUAGE=fr
+
 # Azure DevOps Configuration
 AZURE_DEVOPS_ORG=your-organization
 AZURE_DEVOPS_PROJECT=your-project
@@ -103,6 +107,15 @@ ollama list
 ```
 
 4. Update `OLLAMA_MODEL` in `.env` with your preferred model
+
+## Language Configuration
+
+The application supports both French and English responses. Set the `LANGUAGE` environment variable:
+
+- **French** (default): `LANGUAGE=fr`
+- **English**: `LANGUAGE=en`
+
+When set to French, the LLM will receive prompts in French and return analysis results in French. The JSON structure remains the same, but all feedback and recommendations will be in the configured language.
 
 ## Usage
 
@@ -273,6 +286,7 @@ All configuration is managed through environment variables:
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | API server port | 3000 |
+| `LANGUAGE` | Response language (fr or en) | fr |
 | `AZURE_DEVOPS_ORG` | Azure DevOps organization name | - |
 | `AZURE_DEVOPS_PROJECT` | Azure DevOps project name | - |
 | `AZURE_DEVOPS_PAT` | Personal Access Token | - |

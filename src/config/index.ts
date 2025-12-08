@@ -4,6 +4,7 @@ dotenv.config();
 
 interface Config {
   port: number;
+  language: string;
   azureDevOps: {
     organization: string;
     project: string;
@@ -17,6 +18,7 @@ interface Config {
 
 const config: Config = {
   port: parseInt(process.env.PORT || '3000', 10),
+  language: process.env.LANGUAGE || 'fr',
   azureDevOps: {
     organization: process.env.AZURE_DEVOPS_ORG || '',
     project: process.env.AZURE_DEVOPS_PROJECT || '',
