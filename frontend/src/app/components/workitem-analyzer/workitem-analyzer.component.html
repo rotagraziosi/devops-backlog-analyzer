@@ -1,0 +1,110 @@
+<div class="analyzer-container">
+  <div class="header">
+    <h1>Analyse d'Élément de Backlog</h1>
+    <p class="subtitle">Vérification de la Définition de Prêt (Definition of Ready)</p>
+  </div>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label for="workItemId">ID de l'Élément de Travail</label>
+      <div class="input-row">
+        <input
+          id="workItemId"
+          type="number"
+          [(ngModel)]="workItemId"
+          placeholder="Entrez l'ID de l'élément"
+          [disabled]="loading"
+          (keyup.enter)="analyzeWorkItem()"
+        />
+        <button
+          class="btn-primary"
+          (click)="analyzeWorkItem()"
+          [disabled]="loading || !workItemId"
+        >
+          {{ loading ? 'Analyse en cours...' : 'Analyser' }}
+        </button>
+        <button
+          class="btn-secondary"
+          (click)="reset()"
+          [disabled]="loading"
+          *ngIf="analysisResult || error"
+        >
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    <div class="error-icon">⚠️</div>
+    <div class="error-text">{{ error }}</div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Analyse en cours...</p>
+  </div>
+
+  <div class="results-section" *ngIf="analysisResult && !loading">
+    <div class="status-card" [class.ready]="analysisResult.isReady" [class.not-ready]="!analysisResult.isReady">
+      <div class="status-icon">{{ analysisResult.isReady ? '✅' : '❌' }}</div>
+      <div class="status-text">
+        <h2>{{ analysisResult.isReady ? 'Prêt pour le Développement' : 'Non Prêt' }}</h2>
+        <p>Élément de Travail #{{ analysisResult.workItemId }}</p>
+      </div>
+    </div>
+
+    <div class="missing-elements" *ngIf="analysisResult.missingElements.length > 0">
+      <h3>Éléments Manquants</h3>
+      <ul>
+        <li *ngFor="let element of analysisResult.missingElements">{{ element }}</li>
+      </ul>
+    </div>
+
+    <div class="definition-details">
+      <h3>Détails de la Définition de Prêt</h3>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="detail-icon">{{ analysisResult.definitionOfReady.title.exists && analysisResult.definitionOfReady.title.isClear ? '✅' : '❌' }}</span>
+          <h4>Titre</h4>
+        </div>
+        <p class="detail-feedback">{{ analysisResult.definitionOfReady.title.feedback }}</p>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="detail-icon">{{ analysisResult.definitionOfReady.description.exists && analysisResult.definitionOfReady.description.isExhaustive && analysisResult.definitionOfReady.description.describesValue ? '✅' : '❌' }}</span>
+          <h4>Description</h4>
+        </div>
+        <p class="detail-feedback">{{ analysisResult.definitionOfReady.description.feedback }}</p>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="detail-icon">{{ analysisResult.definitionOfReady.acceptanceCriteria.exists && analysisResult.definitionOfReady.acceptanceCriteria.count! >= 2 && analysisResult.definitionOfReady.acceptanceCriteria.arePrecise && analysisResult.definitionOfReady.acceptanceCriteria.coverScope ? '✅' : '❌' }}</span>
+          <h4>Critères d'Acceptation</h4>
+          <span class="badge" *ngIf="analysisResult.definitionOfReady.acceptanceCriteria.count !== undefined">
+            {{ analysisResult.definitionOfReady.acceptanceCriteria.count }} critère(s)
+          </span>
+        </div>
+        <p class="detail-feedback">{{ analysisResult.definitionOfReady.acceptanceCriteria.feedback }}</p>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="detail-icon">{{ analysisResult.definitionOfReady.estimation.exists ? '✅' : '❌' }}</span>
+          <h4>Estimation (Story Points)</h4>
+        </div>
+        <p class="detail-feedback">{{ analysisResult.definitionOfReady.estimation.feedback }}</p>
+      </div>
+    </div>
+
+    <div class="recommendations" *ngIf="analysisResult.recommendations.length > 0">
+      <h3>Recommandations</h3>
+      <ul>
+        <li *ngFor="let recommendation of analysisResult.recommendations">{{ recommendation }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
