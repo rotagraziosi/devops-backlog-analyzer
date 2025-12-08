@@ -1,15 +1,39 @@
 # DevOps Agile Props Filling
 
-A Node.js REST API that analyzes Azure DevOps backlog items against the Definition of Ready using Ollama for AI-powered analysis.
+A full-stack application that analyzes Azure DevOps backlog items against the Definition of Ready using Ollama for AI-powered analysis.
+
+## Project Structure
+
+This project is organized into two main parts:
+
+```
+devops-agile-props-filling/
+├── backend/           # Node.js Express API with TypeScript
+│   ├── src/
+│   │   ├── clients/       # Azure DevOps & Ollama clients
+│   │   ├── services/      # Business logic
+│   │   ├── routes/        # API endpoints
+│   │   ├── config/        # Configuration
+│   │   └── types/         # TypeScript types
+│   ├── package.json
+│   └── README.md          # Backend documentation
+├── frontend/          # Angular application (to be created)
+└── README.md          # This file
+```
 
 ## Features
 
-- Fetch Azure DevOps work item details via REST API
-- Analyze backlog items against Definition of Ready criteria
-- Generate structured feedback using Ollama LLM
-- Provide actionable recommendations for improvement
-- RESTful API endpoints for easy integration
-- Multi-language support (French and English)
+- **Backend API** (Node.js + Express + TypeScript)
+  - Fetch Azure DevOps work item details via REST API
+  - Analyze backlog items against Definition of Ready criteria
+  - Generate structured feedback using Ollama LLM
+  - Provide actionable recommendations for improvement
+  - Multi-language support (French and English)
+
+- **Frontend** (Angular)
+  - Simple interface to input work item ID
+  - Display analysis results
+  - (To be implemented)
 
 ## Definition of Ready
 
@@ -20,40 +44,21 @@ The application checks backlog items against these criteria:
 3. **At least 2 acceptance criteria** that precisely cover the scope
 4. **Story point estimation**
 
-## Architecture
-
-The application follows a layered architecture:
-
-```
-src/
-├── clients/           # External service clients
-│   ├── azureDevOpsClient.ts   # Azure DevOps API integration
-│   └── ollamaClient.ts        # Ollama LLM integration
-├── services/          # Business logic layer
-│   ├── analysisService.ts     # Main analysis orchestration
-│   └── promptService.ts       # LLM prompt generation
-├── routes/            # API endpoints
-│   ├── analysisRoutes.ts      # Work item analysis endpoints
-│   └── healthRoutes.ts        # Health check endpoints
-├── config/            # Configuration management
-├── types/             # TypeScript type definitions
-├── app.ts             # Express application setup
-└── index.ts           # Application entry point
-```
-
 ## Prerequisites
 
 - Node.js (v18 or higher)
 - npm or yarn
 - [Ollama](https://ollama.ai/) installed and running locally
 - Azure DevOps account with Personal Access Token (PAT)
+- Angular CLI (for frontend development)
 
-## Installation
+## Quick Start
 
-1. Clone the repository:
+### Backend Setup
+
+1. Navigate to the backend directory:
 ```bash
-git clone <repository-url>
-cd devops-agile-props-filling
+cd backend
 ```
 
 2. Install dependencies:
@@ -83,12 +88,44 @@ OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=llama2
 ```
 
+5. Start the backend:
+```bash
+npm run dev
+```
+
+The API will be available at `http://localhost:3000`
+
+### Frontend Setup
+
+The frontend folder is ready for your Angular application. You can initialize it with:
+
+```bash
+cd frontend
+ng new . --skip-git
+```
+
+Or create your Angular app structure as you prefer.
+
+## Backend API Documentation
+
+For detailed backend API documentation, see [backend/README.md](backend/README.md)
+
+### Main Endpoints
+
+- **GET/POST** `/api/analyze/:workItemId` - Analyze a work item
+- **GET** `/api/health` - Check service status
+
+Example request:
+```bash
+curl http://localhost:3000/api/analyze/12345
+```
+
 ## Azure DevOps Setup
 
 1. Generate a Personal Access Token (PAT):
    - Go to Azure DevOps → User Settings → Personal Access Tokens
    - Create new token with "Work Items (Read)" permission
-   - Copy the token to your `.env` file
+   - Copy the token to your `.env` file in the backend folder
 
 2. Set your organization and project names in `.env`
 
@@ -106,182 +143,48 @@ ollama pull llama2
 ollama list
 ```
 
-4. Update `OLLAMA_MODEL` in `.env` with your preferred model
-
 ## Language Configuration
 
-The application supports both French and English responses. Set the `LANGUAGE` environment variable:
+The application supports both French and English responses. Set the `LANGUAGE` environment variable in `backend/.env`:
 
 - **French** (default): `LANGUAGE=fr`
 - **English**: `LANGUAGE=en`
 
-When set to French, the LLM will receive prompts in French and return analysis results in French. The JSON structure remains the same, but all feedback and recommendations will be in the configured language.
-
-## Usage
-
-### Development Mode
-
-Run with hot-reload:
-```bash
-npm run dev
-```
-
-### Production Mode
-
-Build and run:
-```bash
-npm run build
-npm start
-```
-
-## API Endpoints
-
-### Analyze Work Item
-
-Analyze a work item against Definition of Ready:
-
-**GET/POST** `/api/analyze/:workItemId`
-
-Example:
-```bash
-curl http://localhost:3000/api/analyze/12345
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "workItemId": 12345,
-    "isReady": false,
-    "missingElements": [
-      "Acceptance criteria count is below minimum",
-      "Story points not set"
-    ],
-    "definitionOfReady": {
-      "title": {
-        "exists": true,
-        "isClear": true,
-        "feedback": "Title is clear and concise"
-      },
-      "description": {
-        "exists": true,
-        "isExhaustive": true,
-        "describesValue": true,
-        "feedback": "Description clearly describes the value"
-      },
-      "acceptanceCriteria": {
-        "exists": true,
-        "count": 1,
-        "arePrecise": false,
-        "coverScope": false,
-        "feedback": "Only 1 acceptance criteria found, need at least 2"
-      },
-      "estimation": {
-        "exists": false,
-        "feedback": "Story points not set"
-      }
-    },
-    "recommendations": [
-      "Add at least one more acceptance criteria",
-      "Set story points estimation"
-    ]
-  }
-}
-```
-
-### Health Check
-
-Check service status:
-
-**GET** `/api/health`
-
-Example:
-```bash
-curl http://localhost:3000/api/health
-```
-
-Response:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-12-08T10:30:00.000Z",
-  "services": {
-    "api": "ok",
-    "azureDevOps": "ok",
-    "ollama": "ok"
-  }
-}
-```
-
-### Root
-
-Get API information:
-
-**GET** `/`
-
-## Project Structure
-
-```
-devops-agile-props-filling/
-├── src/
-│   ├── clients/
-│   │   ├── azureDevOpsClient.ts
-│   │   └── ollamaClient.ts
-│   ├── services/
-│   │   ├── analysisService.ts
-│   │   └── promptService.ts
-│   ├── routes/
-│   │   ├── analysisRoutes.ts
-│   │   └── healthRoutes.ts
-│   ├── config/
-│   │   └── index.ts
-│   ├── types/
-│   │   └── index.ts
-│   ├── app.ts
-│   └── index.ts
-├── dist/              # Compiled JavaScript (generated)
-├── .env               # Environment variables (create from .env.example)
-├── .env.example       # Environment variables template
-├── package.json
-├── tsconfig.json
-└── README.md
-```
+When set to French, the LLM will receive prompts in French and return analysis results in French.
 
 ## Development
 
-### Build TypeScript
+### Backend Development
 
 ```bash
-npm run build
+cd backend
+npm run dev
 ```
 
-### Lint Code
+### Frontend Development
+
+After setting up your Angular app:
 
 ```bash
-npm run lint
+cd frontend
+ng serve
 ```
 
-## Error Handling
-
-The API provides structured error responses:
-
+Configure proxy to backend API by creating `frontend/proxy.conf.json`:
 ```json
 {
-  "success": false,
-  "error": "Error message here"
+  "/api": {
+    "target": "http://localhost:3000",
+    "secure": false
+  }
 }
 ```
 
-Common error scenarios:
-- Invalid work item ID (400)
-- Work item not found (500)
-- Azure DevOps authentication failure (500)
-- Ollama service unavailable (500)
+Then update `angular.json` to use the proxy configuration.
 
 ## Configuration
 
-All configuration is managed through environment variables:
+All backend configuration is managed through environment variables in `backend/.env`:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -298,7 +201,7 @@ All configuration is managed through environment variables:
 ### Ollama Connection Issues
 
 - Verify Ollama is running: `ollama list`
-- Check the base URL in `.env`
+- Check the base URL in `backend/.env`
 - Ensure the model is pulled: `ollama pull llama2`
 
 ### Azure DevOps Authentication
@@ -306,11 +209,6 @@ All configuration is managed through environment variables:
 - Verify PAT has correct permissions
 - Check organization and project names
 - Ensure PAT hasn't expired
-
-### TypeScript Compilation
-
-- Clear dist folder and rebuild: `rm -rf dist && npm run build`
-- Check `tsconfig.json` configuration
 
 ## License
 
