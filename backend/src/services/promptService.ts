@@ -1,4 +1,4 @@
-import { WorkItem } from '../types';
+import { WorkItem, WorkItemComment } from '../types';
 import config from '../config';
 
 export class PromptService {
@@ -135,6 +135,126 @@ Fournissez votre analyse au format JSON suivant (répondez UNIQUEMENT avec du JS
       .replace(/&quot;/g, '"')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  generateAcceptanceCriteriaPrompt(workItem: WorkItem, comments: WorkItemComment[]): string {
+    const language = config.language;
+
+    if (language === 'fr') {
+      return this.generateFrenchAcceptanceCriteriaPrompt(workItem, comments);
+    }
+
+    return this.generateEnglishAcceptanceCriteriaPrompt(workItem, comments);
+  }
+
+  private generateEnglishAcceptanceCriteriaPrompt(workItem: WorkItem, comments: WorkItemComment[]): string {
+    const title = workItem.fields['System.Title'] || 'No title';
+    const description = workItem.fields['System.Description'] || 'No description';
+    const existingAC = workItem.fields['Microsoft.VSTS.Common.AcceptanceCriteria'] || '';
+    const strippedAC = this.stripHtml(existingAC);
+
+    const commentsText = comments.length > 0
+      ? comments.map(c => `- ${c.createdBy.displayName}: ${this.stripHtml(c.text)}`).join('\n')
+      : 'No comments';
+
+    // Determine mode based on existing AC count
+    const acLines = strippedAC.split(/[\n\r]+/).filter(line => line.trim().length > 0);
+    const existingCount = acLines.length;
+
+    let modeInstruction: string;
+    if (existingCount === 0) {
+      modeInstruction = 'No acceptance criteria exist. Generate 3-5 new acceptance criteria.';
+    } else if (existingCount <= 2) {
+      modeInstruction = `Only ${existingCount} acceptance criteria exist. Generate 2-3 additional criteria to complement the existing ones.`;
+    } else {
+      modeInstruction = `${existingCount} acceptance criteria already exist. Suggest improvements or refinements to the existing criteria.`;
+    }
+
+    const prompt = `You are an expert Agile coach specializing in writing clear, testable acceptance criteria for user stories.
+
+**Task**: ${modeInstruction}
+
+Analyze the following backlog item and generate acceptance criteria:
+
+**Work Item ID**: ${workItem.id}
+**Title**: ${title}
+**Description**: ${this.stripHtml(description)}
+**Existing Acceptance Criteria**: ${strippedAC || 'None'}
+**Comments/Discussion**:
+${commentsText}
+
+Guidelines for acceptance criteria:
+- Each criterion should be specific and testable
+- Use the Given/When/Then format when appropriate
+- Focus on user-visible behavior and outcomes
+- Cover edge cases and error scenarios
+- Be concise but complete
+
+Provide your response in the following JSON format (respond ONLY with valid JSON, no additional text):
+
+{
+  "existingAcceptanceCriteria": ["list of existing AC, empty array if none"],
+  "generatedAcceptanceCriteria": ["list of generated AC"],
+  "mode": "new|augment|improve",
+  "reasoning": "Brief explanation of why these criteria were generated"
+}`;
+
+    return prompt;
+  }
+
+  private generateFrenchAcceptanceCriteriaPrompt(workItem: WorkItem, comments: WorkItemComment[]): string {
+    const title = workItem.fields['System.Title'] || 'Pas de titre';
+    const description = workItem.fields['System.Description'] || 'Pas de description';
+    const existingAC = workItem.fields['Microsoft.VSTS.Common.AcceptanceCriteria'] || '';
+    const strippedAC = this.stripHtml(existingAC);
+
+    const commentsText = comments.length > 0
+      ? comments.map(c => `- ${c.createdBy.displayName}: ${this.stripHtml(c.text)}`).join('\n')
+      : 'Aucun commentaire';
+
+    // Determine mode based on existing AC count
+    const acLines = strippedAC.split(/[\n\r]+/).filter(line => line.trim().length > 0);
+    const existingCount = acLines.length;
+
+    let modeInstruction: string;
+    if (existingCount === 0) {
+      modeInstruction = 'Aucun critère d\'acceptation n\'existe. Générez 3-5 nouveaux critères d\'acceptation.';
+    } else if (existingCount <= 2) {
+      modeInstruction = `Seulement ${existingCount} critère(s) d'acceptation existe(nt). Générez 2-3 critères supplémentaires pour compléter les existants.`;
+    } else {
+      modeInstruction = `${existingCount} critères d'acceptation existent déjà. Suggérez des améliorations ou des raffinements aux critères existants.`;
+    }
+
+    const prompt = `Vous êtes un expert coach Agile spécialisé dans la rédaction de critères d'acceptation clairs et testables pour les user stories.
+
+**Tâche**: ${modeInstruction}
+
+Analysez l'élément de backlog suivant et générez des critères d'acceptation :
+
+**ID de l'élément**: ${workItem.id}
+**Titre**: ${title}
+**Description**: ${this.stripHtml(description)}
+**Critères d'acceptation existants**: ${strippedAC || 'Aucun'}
+**Commentaires/Discussion**:
+${commentsText}
+
+Lignes directrices pour les critères d'acceptation :
+- Chaque critère doit être spécifique et testable
+- Utilisez le format Étant donné/Quand/Alors lorsque c'est approprié
+- Concentrez-vous sur le comportement visible par l'utilisateur et les résultats
+- Couvrez les cas limites et les scénarios d'erreur
+- Soyez concis mais complet
+
+Fournissez votre réponse au format JSON suivant (répondez UNIQUEMENT avec du JSON valide, aucun texte supplémentaire) :
+
+{
+  "existingAcceptanceCriteria": ["liste des CA existants, tableau vide si aucun"],
+  "generatedAcceptanceCriteria": ["liste des CA générés"],
+  "mode": "new|augment|improve",
+  "reasoning": "Brève explication de pourquoi ces critères ont été générés"
+}`;
+
+    return prompt;
   }
 }
 

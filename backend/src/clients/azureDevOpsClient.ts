@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import config from '../config';
-import { WorkItem } from '../types';
+import { WorkItem, WorkItemCommentsResponse } from '../types';
 
 export class AzureDevOpsClient {
   private client: AxiosInstance;
@@ -49,6 +49,28 @@ export class AzureDevOpsClient {
       throw new Error('Azure DevOps configuration is incomplete. Check environment variables.');
     }
     return true;
+  }
+
+  async getWorkItemComments(id: number): Promise<WorkItemCommentsResponse> {
+    const url = `/${this.project}/_apis/wit/workitems/${id}/comments`;
+    try {
+      const response = await this.client.get(
+        url,
+        {
+          params: {
+            'api-version': '7.1-preview.4',
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          `Failed to fetch comments for work item ${id}: ${error.response?.data?.message || error.message}`
+        );
+      }
+      throw error;
+    }
   }
 }
 

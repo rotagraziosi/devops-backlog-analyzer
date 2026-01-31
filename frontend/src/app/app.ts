@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { WorkitemAnalyzerComponent } from './components/workitem-analyzer/workitem-analyzer.component';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [WorkitemAnalyzerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

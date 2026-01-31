@@ -1,1 +1,13 @@
-<app-workitem-analyzer></app-workitem-analyzer>
+<div class="app-container">
+  <nav class="main-nav">
+    <div class="nav-brand">DevOps Backlog Analyzer</div>
+    <div class="nav-links">
+      <a routerLink="/analyze" routerLinkActive="active">Definition of Ready</a>
+      <a routerLink="/generate-ac" routerLinkActive="active">AC Generator</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

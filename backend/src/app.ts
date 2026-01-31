@@ -2,6 +2,7 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import analysisRoutes from './routes/analysisRoutes';
 import healthRoutes from './routes/healthRoutes';
+import acceptanceCriteriaRoutes from './routes/acceptanceCriteriaRoutes';
 
 const app: Express = express();
 
@@ -19,6 +20,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Routes
 app.use('/api', analysisRoutes);
 app.use('/api', healthRoutes);
+app.use('/api', acceptanceCriteriaRoutes);
 
 // Root endpoint
 app.get('/', (req: Request, res: Response) => {
@@ -27,6 +29,7 @@ app.get('/', (req: Request, res: Response) => {
     version: '1.0.0',
     endpoints: {
       analyze: 'GET/POST /api/analyze/:workItemId',
+      generateAC: 'GET /api/generate-ac/:workItemId',
       health: 'GET /api/health',
     },
   });

@@ -57,3 +57,26 @@ export interface OllamaResponse {
   response: string;
   done: boolean;
 }
+
+export interface WorkItemComment {
+  id: number;
+  text: string;
+  createdBy: {
+    displayName: string;
+  };
+  createdDate: string;
+}
+
+export interface WorkItemCommentsResponse {
+  count: number;
+  comments: WorkItemComment[];
+}
+
+export interface AcceptanceCriteriaResult {
+  workItemId: number;
+  title: string;
+  existingAcceptanceCriteria: string[];
+  generatedAcceptanceCriteria: string[];
+  mode: 'new' | 'augment' | 'improve';
+  reasoning: string;
+}

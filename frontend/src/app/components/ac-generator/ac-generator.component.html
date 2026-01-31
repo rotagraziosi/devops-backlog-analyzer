@@ -1,0 +1,80 @@
+<div class="ac-generator-container">
+  <div class="header">
+    <h1>Generateur de Criteres d'Acceptation</h1>
+    <p class="subtitle">Generation automatique de criteres d'acceptation basee sur le contenu de l'element</p>
+  </div>
+
+  <div class="input-section">
+    <div class="input-group">
+      <label for="workItemId">ID de l'Element de Travail</label>
+      <div class="input-row">
+        <input
+          id="workItemId"
+          type="number"
+          [(ngModel)]="workItemId"
+          placeholder="Entrez l'ID de l'element"
+          [disabled]="loading"
+          (keyup.enter)="generateAC()"
+        />
+        <button
+          class="btn-primary"
+          (click)="generateAC()"
+          [disabled]="loading || !workItemId"
+        >
+          {{ loading ? 'Generation en cours...' : 'Generer' }}
+        </button>
+        <button
+          class="btn-secondary"
+          (click)="reset()"
+          [disabled]="loading"
+          *ngIf="result || error"
+        >
+          Reinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    <div class="error-icon">!</div>
+    <div class="error-text">{{ error }}</div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Generation des criteres d'acceptation...</p>
+  </div>
+
+  <div class="results-section" *ngIf="result && !loading">
+    <div class="result-header">
+      <div class="work-item-info">
+        <h2>{{ result.title }}</h2>
+        <p>Element de Travail #{{ result.workItemId }}</p>
+      </div>
+      <div class="mode-badge" [ngClass]="getModeClass(result.mode)">
+        {{ getModeLabel(result.mode) }}
+      </div>
+    </div>
+
+    <div class="reasoning-card" *ngIf="result.reasoning">
+      <h3>Raisonnement</h3>
+      <p>{{ result.reasoning }}</p>
+    </div>
+
+    <div class="ac-section existing-ac" *ngIf="result.existingAcceptanceCriteria.length > 0">
+      <h3>Criteres d'Acceptation Existants</h3>
+      <ul>
+        <li *ngFor="let ac of result.existingAcceptanceCriteria">{{ ac }}</li>
+      </ul>
+    </div>
+
+    <div class="ac-section generated-ac">
+      <h3>
+        {{ result.mode === 'improve' ? 'Ameliorations Suggerees' : 'Criteres d\'Acceptation Generes' }}
+      </h3>
+      <ul>
+        <li *ngFor="let ac of result.generatedAcceptanceCriteria">{{ ac }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
