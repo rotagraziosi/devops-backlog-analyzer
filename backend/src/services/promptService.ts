@@ -16,7 +16,7 @@ export class PromptService {
     const title = workItem.fields['System.Title'] || 'No title';
     const description = workItem.fields['System.Description'] || 'No description';
     const acceptanceCriteria = workItem.fields['Microsoft.VSTS.Common.AcceptanceCriteria'] || 'No acceptance criteria';
-    const storyPoints = workItem.fields['Microsoft.VSTS.Scheduling.StoryPoints'];
+    const storyPoints = workItem.fields['Custom.Estimation'];
 
     const prompt = `You are an expert Agile coach analyzing Azure DevOps backlog items for their "Definition of Ready".
 
@@ -72,7 +72,7 @@ Provide your analysis in the following JSON format (respond ONLY with valid JSON
     const title = workItem.fields['System.Title'] || 'Pas de titre';
     const description = workItem.fields['System.Description'] || 'Pas de description';
     const acceptanceCriteria = workItem.fields['Microsoft.VSTS.Common.AcceptanceCriteria'] || 'Pas de critères d\'acceptation';
-    const storyPoints = workItem.fields['Microsoft.VSTS.Scheduling.StoryPoints'];
+    const storyPoints = workItem.fields['Custom.Estimation'];
 
     const prompt = `Vous êtes un expert coach Agile analysant les éléments de backlog Azure DevOps pour leur "Définition de Prêt" (Definition of Ready).
 

@@ -23,16 +23,16 @@ export class AzureDevOpsClient {
   }
 
   async getWorkItem(id: number): Promise<WorkItem> {
+    const url = `/${this.project}/_apis/wit/workitems/${id}`;
     try {
       const response = await this.client.get(
-        `/${this.project}/_apis/wit/workitems/${id}`,
+        url,
         {
           params: {
             'api-version': '7.0',
           },
         }
       );
-
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {

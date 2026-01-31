@@ -5,6 +5,7 @@ export interface WorkItem {
     'System.Description'?: string;
     'Microsoft.VSTS.Common.AcceptanceCriteria'?: string;
     'Microsoft.VSTS.Scheduling.StoryPoints'?: number;
+    'Custom.Estimation'? : number;
     'System.WorkItemType': string;
     'System.State': string;
   };
